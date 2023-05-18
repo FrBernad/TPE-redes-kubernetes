@@ -16,8 +16,8 @@ spec:
     spec:
       restartPolicy: Always
       containers:
-      - name: songs-backend-image
-        image: songs-backend-image
+      - name: songs-backend
+        image: songs-backend
         imagePullPolicy: Never
         ports:
         - containerPort: 8080

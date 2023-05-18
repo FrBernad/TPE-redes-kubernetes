@@ -2,16 +2,25 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: backend-service-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   rules:
-  - host: api.movies.com
+  - host: redes.apis.com
     http:
       paths:
-      - path: /
+      - path: /movies(/|$)(.*)
         pathType: Prefix
         backend:
           service:
             name: movies-backend-service
+            port:
+              number: 8080
+      - path: /songs(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: songs-backend-service
             port:
               number: 8080
   ingressClassName: nginx
