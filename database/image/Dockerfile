@@ -1,5 +1,6 @@
 FROM postgres:15-alpine
 
-COPY init.sql /docker-entrypoint-initdb.d/init.sql
+COPY init-movies.sql /docker-entrypoint-initdb.d/
+COPY init-songs.sql /docker-entrypoint-initdb.d/
 
 CMD ["postgres"]
