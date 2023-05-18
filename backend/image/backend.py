@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import or_
+from marshmallow import Schema, fields
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://user:password@database/movies_db'
@@ -23,6 +24,18 @@ class Movies(db.Model):
     def __repr__(self):
         return '<Movie %r>' % self.title
 
+class MoviesSchema(Schema):
+    id = fields.Int(dump_only=True)
+    director = fields.Str()
+    year = fields.Int()
+    name = fields.Str(required=True)
+    genre = fields.Str(required=True)
+    score = fields.Float()
+    writer = fields.Str()
+    star = fields.Str()
+    company = fields.Str()
+    country = fields.Str()
+
 @app.route('/movies', methods=['GET'])
 def get_movies():
     title = request.args.get('title')
@@ -34,9 +47,17 @@ def get_movies():
 
     movies = movies[:size]
 
-    movies_json = [{'name': movie.name} for movie in movies]
+    schema = MoviesSchema(many=True)
+    serialized_movies = schema.dump(movies)
 
-    return jsonify(movies_json), 200
+    return serialized_movies, 200
+
+@app.route('/', methods=['GET'])
+def get_api_specification():
+    specs = {
+        "movies_url": "http://api.movies.com/movies?title={title}{&size}",
+    }
+    return specs, 200
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8080)
+    app.run(debug=True, port=8080, host='0.0.0.0')

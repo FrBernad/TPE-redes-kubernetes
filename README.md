@@ -11,6 +11,6 @@ una API en un puerto genérico (distinto a 80)
 - Implementar una base de datos local en un servidor y exponer un servicio que
 redireccione el tráfico del cluster al servidor.
 - Deployar un web server (nginx o Apache HTTPD escuchando en el 80) y hacer
-un proxy reverso a la API.
-- Mostrar dos versiones de API distintas conviviendo.
+un proxy reverso a la API. (Usar un ingress controller)
+- Mostrar dos versiones de API distintas conviviendo (dos servicios distintos nomás bastan)
 - Opcional: Integrar los servicios de Istio y Kiali al cluster.
