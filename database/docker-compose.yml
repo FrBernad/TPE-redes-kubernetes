@@ -1,0 +1,23 @@
+version: "3.3"
+services:
+  db:
+    container_name: db
+    build:
+      context: ./image
+    ports:
+      - 5432:5432
+    env_file:
+      - ./db.env
+    volumes:
+      - type: volume
+        source: db-vol
+        target: /var/lib/postgresql/data 
+    networks:
+      - default
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      interval: 4s
+
+volumes:
+  db-vol: 
+    name: db-vol
