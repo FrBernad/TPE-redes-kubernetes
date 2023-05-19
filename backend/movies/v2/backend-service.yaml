@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: movies-v1-backend-service
+  name: movies-v2-backend-service
   labels:
-    app: movies-v1-backend-service
+    app: movies-v2-backend-service
 spec:
   type: ClusterIP
   ports:
@@ -11,4 +11,4 @@ spec:
       targetPort: 8080
       protocol: TCP
   selector:
-    app: movies-v1-backend
+    app: movies-v2-backend

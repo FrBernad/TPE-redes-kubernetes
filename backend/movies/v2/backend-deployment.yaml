@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: movies-v1-backend
+  name: movies-v2-backend
   labels:
-    app: movies-v1-backend
+    app: movies-v2-backend
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: movies-v1-backend
+      app: movies-v2-backend
   template:
     metadata:
       labels:
-        app: movies-v1-backend
+        app: movies-v2-backend
     spec:
       restartPolicy: Always
       containers:
-        - name: movies-v1-backend
-          image: movies-v1-backend
+        - name: movies-v2-backend
+          image: movies-v2-backend
           imagePullPolicy: Never
           ports:
             - containerPort: 8080

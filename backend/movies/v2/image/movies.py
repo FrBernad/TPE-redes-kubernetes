@@ -13,6 +13,12 @@ class Movies(db.Model):
     year = db.Column(db.Integer)
     name = db.Column(db.String(200), nullable=False)
     director = db.Column(db.String(150), nullable=True)
+    genre =   db.Column(db.String(60), nullable=False)
+    score  =  db.Column(db.NUMERIC)
+    writer   = db.Column(db.String(150), nullable=True)
+    star     = db.Column(db.String(150), nullable=True)
+    company  = db.Column(db.String(120), nullable=True)
+    country = db.Column(db.String(80), nullable=True)
 
     def __repr__(self):
         return '<Movie %r>' % self.name
@@ -22,6 +28,12 @@ class MoviesSchema(Schema):
     year = fields.Int()
     name = fields.Str(required=True)
     director = fields.Str()
+    genre = fields.Str(required=True)
+    score = fields.Float()
+    writer = fields.Str()
+    star = fields.Str()
+    company = fields.Str()
+    country = fields.Str()
 
 @app.route('/movies', methods=['GET'])
 def get_movies():
@@ -42,7 +54,7 @@ def get_movies():
 @app.route('/', methods=['GET'])
 def get_api_specification():
     specs = {
-        "movies_url": "http://api.movies.com/v1/movies?title={title}{&size}",
+        "movies_url": "http://api.movies.com/v2/movies?title={title}{&size}",
     }
     return specs, 200
 
