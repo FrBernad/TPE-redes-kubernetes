@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: movies-v1-backend
+  name: movies-v1-backend-deployment
   labels:
     app: movies-v1-backend
 spec:
@@ -17,7 +17,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: movies-v1-backend
-          image: movies-v1-backend
+          image: movies:v1
           imagePullPolicy: Never
           ports:
             - containerPort: 8080

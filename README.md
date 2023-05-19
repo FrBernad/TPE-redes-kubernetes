@@ -7,7 +7,7 @@
 
 ## Consigna
 - Crear un cluster de Kubernetes de un Master y al menos dos slave, que exponga
-una API en un puerto genérico (distinto a 80)
+una API en un puerto genérico (distinto a 80) (mostrar el pod del q viene)
 - Implementar una base de datos local en un servidor y exponer un servicio que
 redireccione el tráfico del cluster al servidor.
 - Deployar un web server (nginx o Apache HTTPD escuchando en el 80) y hacer

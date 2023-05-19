@@ -6,21 +6,21 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   rules:
-  - host: redes.apis.com
+  - host: api.movies.com
     http:
       paths:
-      - path: /movies(/|$)(.*)
+      - path: /v1(/|$)(.*)
         pathType: Prefix
         backend:
           service:
-            name: movies-backend-service
+            name: movies-v1-backend-service
             port:
               number: 8080
-      - path: /songs(/|$)(.*)
+      - path: /v2(/|$)(.*)
         pathType: Prefix
         backend:
           service:
-            name: songs-backend-service
+            name: movies-v2-backend-service
             port:
               number: 8080
   ingressClassName: nginx

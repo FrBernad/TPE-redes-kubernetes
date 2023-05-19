@@ -1,16 +1,16 @@
 version: "3.3"
 services:
-  db:
-    container_name: db
+  database:
+    container_name: database
     build:
       context: ./image
     ports:
       - 5432:5432
     env_file:
-      - ./db.env
+      - ./database.env
     volumes:
       - type: volume
-        source: db-vol
+        source: database-vol
         target: /var/lib/postgresql/data 
     networks:
       - default
@@ -19,5 +19,5 @@ services:
       interval: 4s
 
 volumes:
-  db-vol: 
-    name: db-vol
+  database-vol: 
+    name: database-vol
