@@ -4,7 +4,7 @@ from sqlalchemy import or_
 from marshmallow import Schema, fields
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://user:password@database/db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://user:password@database-service/db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 

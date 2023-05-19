@@ -17,7 +17,7 @@ spec:
       restartPolicy: Always
       containers:
       - name: movies-backend
-        image: movies-backend
+        image: movies-backend        
         imagePullPolicy: Never
         ports:
         - containerPort: 8080
