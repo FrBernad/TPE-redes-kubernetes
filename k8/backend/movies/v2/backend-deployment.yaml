@@ -21,3 +21,36 @@ spec:
           imagePullPolicy: Never
           ports:
             - containerPort: 8080
+          env:
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POSTGRES_USER
+              valueFrom:
+                  secretKeyRef:
+                    name: database-secret
+                    key: username
+            - name: POSTGRES_PASS
+              valueFrom:
+                  secretKeyRef:
+                    name: database-secret
+                    key: password
+            - name: POSTGRES_DB
+              valueFrom:
+                  secretKeyRef:
+                    name: database-secret
+                    key: database
+            - name: POSTGRES_HOST
+              valueFrom:
+                  secretKeyRef:
+                    name: database-secret
+                    key: host
