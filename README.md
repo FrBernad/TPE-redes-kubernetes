@@ -7,14 +7,19 @@
 
 ## Consigna
 - Crear un cluster de Kubernetes de un Master y al menos dos slave, que exponga
-una API en un puerto genérico (distinto a 80) (mostrar el pod del q viene)
-- Implementar una base de datos local en un servidor y exponer un servicio que
-redireccione el tráfico del cluster al servidor.
+una API en un puerto genérico (distinto a 80). Exhibir como la información es enviada
+desde distintos Pods.
+- Implementar una base de datos local en un servidor (fuera del cluster de Kubernetes) 
+y exponer un servicio de Kubernetes que redireccione el tráfico del cluster al servidor.
 - Deployar un web server (nginx o Apache HTTPD escuchando en el 80) y hacer
-un proxy reverso a la API. (Usar un ingress controller)
-- Mostrar dos versiones de API distintas conviviendo (dos servicios distintos nomás bastan)
+un proxy reverso a la API. Puede utilizarse un ingress controller.
+- Mostrar dos versiones de API distintas conviviendo.
 - Opcional: Integrar los servicios de Istio y Kiali al cluster.
 
+# Instalación
+
+## Entorno
+El proceso de instalación será explicado para un ambiente de trabajo con Ubuntu 22.04.2 LTS. 
 
 ## Docker
 Para poder inicializar el cluster de Kubernetes es necesario contar con Docker instalado.
@@ -24,7 +29,7 @@ A continuación se mostrarán los pasos sobre cómo realizar la [instalación de
 sudo apt-get remove docker docker-engine docker.io containerd runc
 ```
 ### Instalación utilizando el repositorio apt
-#### Set up del repositorio
+### Set up del repositorio
 ```
 sudo apt-get update
 ```
@@ -46,7 +51,7 @@ echo \
   "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 ```
-#### Instalación del docker engine
+### Instalación del docker engine
 
 ```bash
 sudo apt-get update
@@ -55,15 +60,14 @@ sudo apt-get update
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 ```
 
-Este ultimo comando descarga la imagen hello-world y corre el contenedor. Si ves un mensaje de confirmación, Docker ha sido instalado correctamente.
+Este último comando descarga la imagen hello-world y ejecuta el contenedor. Si ves un mensaje de confirmación, Docker ha sido instalado correctamente.
 ```bash
 sudo docker run hello-world
 ```
 Puede encontrar más detalles sobre cómo realizar la instalación en otras plataformas en el siguiente [link](https://docs.docker.com/engine/install/)
 
-#### Creación de usuario y grupo de docker
+### Creación de usuario y grupo de docker
 Es necesario crear un grupo y usuario de docker para que no sea necesario correr los contenedores como root. Esto se logra con los siguientes comandos.
-sudo groupadd docker
 
 Se crea el grupo de docker.
 ```bash
@@ -80,12 +84,12 @@ Verificar que se pueda correr el siguiente comando
 docker run hello-world
 ```
 ## Kind
-Kind es una herramienta que permite correr cluster de Kubernetes de forma local, utilizando contenedores de Docker.
+Kind es una herramienta que permite correr un cluster de Kubernetes de forma local, utilizando contenedores de Docker.
 ### Instalación
-Continuaremos con la instalación de Kind que permitirá montar un cluster de kubernetes. Con Kind se podrá especificar el número de nodos worker y de nodos control plane.
+Continuaremos con la instalación de Kind que permitirá montar un cluster de kubernetes. Con Kind se podrá especificar el número de nodos worker y de nodos del control plane.
 A continuación se mostrarán los pasos sobre cómo realizar la [instalación de Kind en Linux](https://kind.sigs.k8s.io/docs/user/quick-start/#installing-from-release-binaries).
 
-
+Primero descargamos el ejecutable compatible con nuestra arquitectura.
 ```bash
 - Para AMD64 / x86_64
 [ $(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.19.0/kind-linux-amd64
@@ -93,10 +97,12 @@ A continuación se mostrarán los pasos sobre cómo realizar la [instalación de
 [ $(uname -m) = aarch64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.19.0/kind-linux-arm64
 ```
 
+Le damos permiso de ejecucion.
 ```bash
 chmod +x ./kind
 ```
 
+Lo movemos dentro una carpeta que se encuentre dentro de la variable $PATH.
 ```bash
 sudo mv ./kind /usr/local/bin/kind
 ```
@@ -114,21 +120,25 @@ Moverse dentro del directorio del repositorio clonado.
 ```bash
 cd ./TPE-redes-kubernetes
 ```
-En los siguientes pasos se mencionará cómo conseguir la siguiente arquitectura:
+En los siguientes pasos se mencionará cómo levantar un cluster de kubernetes para una aplicación
+con la siguiente arquitectura:
 
-![alt text](./Diagrama.png "Diagrama")
+![alt text](./assets/diagram.png "Diagrama")
 
-En primer lugar realizaremos un build de la imagen de la base de datos. La imagen no será instanciada dentro del cluster de Kubernetes. El cluster se comunicará con la base de datos a través de la exposición de un servicio externo. 
-Se tomó esta decisión para simular una situación más real, en la que la base de datos de datos no suele encontrarse dentro del cluster.
+En primer lugar realizaremos el build de la imagen de la base de datos. 
+La imagen no será instanciada dentro del cluster de Kubernetes. 
+El cluster se comunicará con la base de datos mediante un servicio de kubernetes encargado de exponerla.
+Se tomó esta decisión para simular que la base de datos actúe como un servicio externo (como indica la consigna).
+En situaciones reales, la base de datos no suele encontrarse dentro del cluster.
 
-Luego vamos a instanciar el contenedor con docker-compose que se encargará de buildear la imagen de la base de datos, de setear las variables de entorno necesarias y de configurar el volumen persistente.
+Luego instanciaremos el contenedor con docker-compose, que se encargará de buildear la imagen de la base de datos, de establecer las variables de entorno necesarias y de configurar el volumen persistente.
 
 ```bash
 docker compose  -f ./database/docker-compose.yml up -d
 ```
 
-A continuación, vamos a crear el cluster de Kubernetes utilizando la configuración que se encuentra en el archivo kind-config/multi-cluster-config.yaml bajo el nombre de "redes".
-En el archivo se especifica la cantidad de nodos worker y de nodos control plane.
+A continuación, crearemos el cluster de Kubernetes utilizando la configuración que se encuentra en el archivo kind-config/multi-cluster-config.yaml bajo el nombre de "redes".
+En el archivo se especifica la cantidad de nodos worker y de nodos del control plane.
 
 ```yaml
 kind: Cluster
@@ -138,20 +148,25 @@ nodes:
 - role: worker
 - role: worker
 ```
-Para la creación del cluster ejecutamos el siguiente comando:
+
+Para la creación del cluster ejecutaremos el siguiente comando:
 ```bash
 kind create cluster --config kind-config/multi-cluster-config.yaml --name redes 
 ```
-Una vez que se inicializa el cluster, podemos ver información del mismo con el siguiente comando:
-```bash
-kubectl cluster-info --context kind-redes
-```
-Además podemos ver el cluster:
+Esto creará un cluster dentro del contexto ***redes***
 
+
+Una vez inicializado el cluster, podemos ver los clusters disponibles con el siguiente comando:
 ```bash
 kind get clusters
 ```
-Por último podemos ver los tres nodos corriendo:
+
+Además, podemos ver información especifica del cluster de la siguiente manera:
+```bash
+kubectl cluster-info
+```
+
+Por último, pueden visualizarse los tres nodos corriendo:
 ```bash
 kubectl get nodes
 ```
@@ -162,14 +177,17 @@ A continuación vamos a buildear las imágenes para instanciar los contenedores 
 ```bash
 docker build -t movies:v1 ./k8/backend/movies/v1/image
 ```
+Esto creará una imagen con el tag ***movies:v1***
 
 - Para la versión 2 de la API
 ```
 docker build -t movies:v2 ./k8/backend/movies/v2/image
 ```
+Esto creará una imagen con el tag ***movies:v2***
 
-Es necesario cargar las imágenes al cluster para poder instanciarlas. Cargamos las dos imágenes al cluster "redes".
+Es necesario cargar las imágenes dentro cluster para poder instanciarlas. 
 
+Cargamos las dos imágenes al cluster "redes":
 ```
 kind load docker-image movies:v1 --name redes
 ```
@@ -177,28 +195,36 @@ kind load docker-image movies:v1 --name redes
 kind load docker-image movies:v2 --name redes
 ````
 
-Ahora vamos a aplicar el manifiesto de la base de datos que se encargará de levantar un servicio. El servicio expondrá un nombre, con el cual podrán comunicarse mediante DNS los demás servicios y/o pods con la base de datos que levantamos anteriormente. 
+Ahora vamos a aplicar el manifiesto de la base de datos que se encargará de levantar un servicio
+de tipo *ExternalName*. 
+Este tipo de servicios, permiten la comunicación mediante DNS de los demás 
+servicios y/o pods con la base de datos que levantamos anteriormente. 
 ```
 kubectl apply -f ./k8/database
 ```
 
-Veamos en que IP está corriendo la base de datos
+Para poder resolver la consulta dns a la base de datos, deberemos configurar
+la entrada de manera local en la maquina host.
+Veamos cual es la ip del host
 ```
-docker inspect database
+ip a
 ```
-Copiamos la IP que aparezca en el campo IPAddress.
+Copiamos la ip del host asignada a cualquier interfaz que no sea loopback.
+Puede por ejemplo ser la interfaz de docker o la interfaz fisica.
 
 Agregaremos en nuestro archivo /etc/hosts la siguiente línea.
 
 > [IP base de datos] database
 
-Ahora vamos a aplicar los manifiestos que se encargará de hacer un deployment de los contenedores que contienen el backend, y además los servicios que permiten la comunicación con los pods.
+Ahora vamos a aplicar los manifiestos que se encargarán de desplegar el deployment con los contenedores 
+del backend, y además los servicios que permiten la comunicación con los pods del mismo.
 
-
+Primero, aplicamos el objeto de kubernetes de tipo ***secret*** que permite establecer variables de entorno para el backend.
 ```
 kubectl apply -f ./k8/backend/movies/secret.yaml 
 ```
 
+Luego, procedemos a aplicar los manifiestos de ambas versiones del backend.
 ```
 kubectl apply -f ./k8/backend/movies/v1
 ```
@@ -207,61 +233,70 @@ kubectl apply -f ./k8/backend/movies/v1
 kubectl apply -f ./k8/backend/movies/v2
 ```
 
-Nos queda aplicar el manifiesto del ingress que sirve como punto de acceso al cluster de kubernetes. Recordar que los servicios de Kubernetes que fueron levantados anteriormente, son solo accesibles desde dentro del cluster. En el caso de ingress, permite que este pueda ser accedido desde afuera.
+Nos queda aplicar el manifiesto del ingress. Este actuará como punto de acceso al cluster de kubernetes. 
+Recordar que los servicios de Kubernetes que fueron levantados anteriormente, son solo accesibles desde dentro del cluster. 
+En el caso del ingress, permite el acceso desde afuera.
 
-El ingress podrá ser accedido mediante DNS. Para ello es necesario agregar la siguiente línea en /etc/hosts
+El ingress definirá reglas de redireccion para el nombre ***api.movies.com***. 
+Para poder ser accedido de manera local mediante DNS, es necesario agregar la siguiente línea en el archivo ***/etc/hosts***.
 ```
 127.0.0.1 api.movies.com
 ```
-Aplicamos los manifiestos del ingress
 
+Aplicamos los manifiestos del ingress
 ```
 kubectl apply -f ./k8/ingress --recursive
 ```
 
-Chequear que el ingress-controller esté corriendo. Se puede chequear mediante el comando
+Chequear que el ingress-controller esté corriendo mediante el comando:
 ```
 kubectl -n ingress-nginx get pods
 ```
 
-Hacemos un port forwarding del servicio de ingress-controller
+Una vez asegurado que esté corriendo el pod, hacemos un port forwarding del servicio de ingress-controller:
 ```
 kubectl -n ingress-nginx port-forward svc/ingress-nginx-controller --address 0.0.0.0 5000:80&
 ```
+Esto es necesario ya que en un caso real, el ingress tendría asignada una IP pública para accederlo.
+En nuestro caso, al tener todo levantado de manera local, no se cuenta con una IP pública y se
+fowardeará el servicio hacia afuera del cluster para poder ser accedido desde la máquina host.
 
-
-
-Podemos ahora realizar llamados a la API en los respectivos endpoints de cada una
+Podemos ahora realizar llamados a la API en sus respectivos endpoints.
+```
+curl "api.movies.com:5000/v1/"
+curl "api.movies.com:5000/v1/movies?name=titanic"
+```
 
 ```
-curl api.movies.com:5000/v1/movies?name=titanic
+curl "api.movies.com:5000/v2/"
+curl "api.movies.com:5000/v2/movies?name=titanic"
 ```
 
-```
-curl api.movies.com:5000/v2/movies?name=titanic
-```
+En las respuestas de cada llamado, además de la información del endpoint, se obtendrá
+la IP y nombre del pod que respondió y el nombre del nodo en el que se encuentra.
 
 ###  Monitoreo del cluster
 
-Para el monitoreo del cluster se utiliza la herramienta Istio y Kiali.
-Istio se encargará de recolectar métricas y analizar el comportamiento de nuestro cluster, mientras que Kiali brindará una interfaz visual tomando los datos que ofrece Istio. 
+Para el monitoreo del cluster se utilizarán las herramientas Istio y Kiali, junto a otras utilidades como Prometheus.
+Istio es un service mesh que permite controlar el tráfico entre servicios dentro del cluster de kubernetes. Por otro lado,
+Kiali permite visualizar, mediante una interfaz gráfica, el estado de cada componente de la red recolecando métricas con 
+Prometheus.
 
-> Instalación
-
-```
-curl -L https://istio.io/downloadIstio | sh -
-```
+#### Instalación
 
 ```
-cd istio-x 
+curl -L https://istio.io/downloadIstio | ISTIO_VERSION=1.17.2 TARGET_ARCH=x86_64 sh -
 ```
-donde x será la versión que instalamos
+
+```
+cd istio-1.17.2
+```
 
 ```
 export PATH=$PWD/bin:$PATH
 ```
 
-> Monitoreo
+#### Monitoreo
 
 ```
 istioctl install --set profile=default -y
@@ -286,7 +321,6 @@ kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.17/samp
 ```
 istioctl dashboard kiali --address 0.0.0.0 &
 ```
-
 
 
 
