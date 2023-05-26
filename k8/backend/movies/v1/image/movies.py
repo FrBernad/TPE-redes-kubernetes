@@ -2,9 +2,12 @@ from flask import Flask, jsonify, request, make_response
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import or_
 from marshmallow import Schema, fields
+from flask_cors import CORS
 import os
 
 app = Flask(__name__)
+
+CORS(app, expose_headers='*')
 
 database_user = os.environ["POSTGRES_USER"]
 database_password = os.environ["POSTGRES_PASS"]
@@ -33,7 +36,7 @@ class MoviesSchema(Schema):
 @app.route('/movies', methods=['GET'])
 def get_movies():
     name = request.args.get('name')
-    size = request.args.get('size', default=10, type=int)
+    size = request.args.get('size', default=5, type=int)
 
     if not name:
         response = jsonify({'error': 'Missing name parameter'})
@@ -67,9 +70,9 @@ def get_api_specification():
 
 def _get_response_headers():
     return {
-        'POD-IP': os.environ.get('POD_IP'),
-        'POD-NAME': os.environ.get('POD_NAME'),
-        'NODE-NAME': os.environ.get('NODE_NAME'),
+        'X-POD-IP': os.environ.get('POD_IP'),
+        'X-POD-NAME': os.environ.get('POD_NAME'),
+        'X-NODE-NAME': os.environ.get('NODE_NAME'),
     }
 
 if __name__ == '__main__':
