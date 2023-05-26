@@ -109,6 +109,7 @@ sudo mv ./kind /usr/local/bin/kind
 Puede encontrar más detalles sobre cómo realizar la instalación en otras plataformas en el siguiente [link](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
 
 
+## Proyecto 
 ### Creación de cluster
 
 Antes de comenzar, clonar el repositorio del siguiente [link de Github](https://github.com/FrBernad/TPE-redes-kubernetes)
@@ -275,7 +276,7 @@ curl "api.movies.com:5000/v2/movies?name=titanic"
 En las respuestas de cada llamado, además de la información del endpoint, se obtendrá
 la IP y nombre del pod que respondió y el nombre del nodo en el que se encuentra.
 
-###  Monitoreo del cluster
+### Monitoreo del cluster
 
 Para el monitoreo del cluster se utilizarán las herramientas Istio y Kiali, junto a otras utilidades como Prometheus.
 Istio es un service mesh que permite controlar el tráfico entre servicios dentro del cluster de kubernetes. Por otro lado,
@@ -322,5 +323,18 @@ kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.17/samp
 istioctl dashboard kiali --address 0.0.0.0 &
 ```
 
+## Frontend
+Instalar node 18 LTS con el siguiente comando:
+```bash
+curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - &&\
+sudo apt-get install -y nodejs  
+```
+
+Entrar a la carpeta del frontend y ejecutar:
+```bash
+npm run dev
+```
+
+Acceder desde un browser a la ip dada por el output del comando anterior.
 
 
