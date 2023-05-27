@@ -327,7 +327,9 @@ sudo apt-get install -y nodejs
 ```
 
 Entrar a la carpeta del frontend y ejecutar:
+
 ```bash
+npm install
 npm run dev
 ```
 
