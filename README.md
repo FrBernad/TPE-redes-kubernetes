@@ -283,6 +283,17 @@ Istio es un service mesh que permite controlar el tráfico entre servicios dentr
 Kiali permite visualizar, mediante una interfaz gráfica, el estado de cada componente de la red recolecando métricas con 
 Prometheus.
 
+Para realizar el monitoreo, es necesario eliminar los manifiestos aplicados anteriormente para que la herramienta sea capaz de configurar las componentes.
+```
+kubectl delete -f ./k8/database
+kubectl delete -f ./k8/backend/movies/secret.yaml 
+kubectl delete -f ./k8/backend/movies/v1
+kubectl delete -f ./k8/backend/movies/v2
+kubectl delete -f ./k8/ingress --recursive
+```
+- Tener en cuenta este último comando puede tomar un mayor tiempo que los anteriores.
+
+
 #### Instalación
 
 ```
@@ -317,6 +328,15 @@ kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.17/samp
 
 ```
 istioctl dashboard kiali --address 0.0.0.0 &
+```
+
+Ahora volvemos a aplicar los manifiestos y a levantar los pods y servicios
+```
+kubectl apply -f ./k8/database
+kubectl apply -f ./k8/backend/movies/secret.yaml 
+kubectl apply -f ./k8/backend/movies/v1
+kubectl apply -f ./k8/backend/movies/v2
+kubectl apply -f ./k8/ingress --recursive
 ```
 
 ## Frontend
