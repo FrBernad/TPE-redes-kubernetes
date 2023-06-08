@@ -215,7 +215,7 @@ Se instanciará el contenedor con docker-compose, que se encargará de buildear 
 docker compose  -f ./database/docker-compose.yml up -d
 ```
 
-A continuación, se creará el clúster de Kubernetes utilizando la configuración que se encuentra en el archivo kind-config/multi-clúster-config.yaml bajo el nombre de "redes". En el archivo se especifica la cantidad de nodos worker y de nodos del control plane. Para cumplir con el enunciado, se configurará un nodo master y dos slaves.
+A continuación, se creará el clúster de Kubernetes utilizando la configuración que se encuentra en el archivo kind-config/multi-cluster-config.yaml bajo el nombre de "redes". En el archivo se especifica la cantidad de nodos worker y de nodos del control plane. Para cumplir con el enunciado, se configurará un nodo master y dos slaves.
 
 ```yaml
 kind: Cluster
